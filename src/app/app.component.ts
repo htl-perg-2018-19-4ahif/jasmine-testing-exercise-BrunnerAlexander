@@ -9,7 +9,12 @@ import { VatCategory } from './vat-categories.service';
 })
 export class AppComponent {
   invoiceLines: InvoiceLine[] = [];
-  invoice: Invoice;
+  invoice: Invoice = {
+    invoiceLines: [],
+    totalPriceExclusiveVat: 0,
+    totalPriceInclusiveVat: 0,
+    totalVat: null
+  };
 
   product = '';
   priceInclusiveVat = 0;
@@ -20,6 +25,19 @@ export class AppComponent {
   constructor(private invoiceCalculator: InvoiceCalculatorService) { }
 
   addInvoice() {
-    // ADD necessary code here
+    const newLine: InvoiceLine = {
+      product: this.product,
+      priceInclusiveVat: this.priceInclusiveVat,
+      vatCategory: null
+    };
+
+    if (this.vatCategoryString === 'Food') {
+      newLine.vatCategory = VatCategory.Food;
+    } else if (this.vatCategoryString === 'Drinks') {
+      newLine.vatCategory = VatCategory.Drinks;
+    }
+
+    this.invoiceLines.push(newLine);
+    this.invoice = this.invoiceCalculator.CalculateInvoice(this.invoiceLines);
   }
 }
